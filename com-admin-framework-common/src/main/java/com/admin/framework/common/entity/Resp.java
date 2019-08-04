@@ -24,7 +24,7 @@ public class Resp<T> {
     private boolean success = true;
 
     /**
-     * 分页结果
+     * 结果
      */
     private Object data;
 

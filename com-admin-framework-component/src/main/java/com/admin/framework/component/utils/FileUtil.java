@@ -126,33 +126,6 @@ public class FileUtil {
         return save(contents.getBytes(),file);
     }
 
-    /**
-     * 获取文件内容
-     * @param filePath
-     * @return
-     */
-    public static String getFileContent(String filePath){
-        File file = new File(filePath);
-        if(!file.exists()){
-            throw new RuntimeException("文件不存在");
-        }
-        try {
-            FileReader reader = new FileReader(file);
-            BufferedReader breader = new BufferedReader(reader);
-            String line = "";
-            String result = "";
-            while ((line = breader.readLine()) != null){
-                result += line + "\n";
-            }
-            return result.toString();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     /**
      * 获取文件路径

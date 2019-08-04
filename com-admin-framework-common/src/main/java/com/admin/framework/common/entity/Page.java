@@ -31,6 +31,10 @@ public class Page<T> extends Resp{
     private Integer totalPage;
 
 
+    public Page(Integer pageSize,Integer currentPage){
+        this.pageSize = pageSize;
+        this.currentPage = currentPage;
+    }
 
     public void setTotalPage(Integer total,Integer pageSize){
         Integer totalPage = 0;
@@ -41,44 +45,6 @@ public class Page<T> extends Resp{
         this.totalPage = totalPage;
     }
 
-    /**
-     * 错误处理
-     * @return
-     */
-    public static Page empty(){
-        Page page = new Page();
-        return page;
-    }
 
-    /**
-     * 错误处理
-     * @return
-     */
-    public static Page error(){
-        return error(Resp.DEFAULT_ERROR_MSG);
-    }
-
-    /**
-     * 错误处理
-     * @param msg 错误消息
-     * @return
-     */
-    public static Page error(String msg){
-        return error(DEFAULT_ERROR_CODE,msg);
-    }
-
-    /**
-     * 错误处理
-     * @param code 错误码
-     * @param msg 错误消息
-     * @return
-     */
-    public static Page error(Integer code, String msg){
-        Page page = new Page();
-        page.setCode(code);
-        page.setMsg(msg);
-        page.setSuccess(false);
-        return page;
-    }
 
 }

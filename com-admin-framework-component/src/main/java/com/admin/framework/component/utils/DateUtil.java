@@ -12,7 +12,7 @@ public class DateUtil {
 
     public static final String FILE_FORMAT = "YYYY/MMdd";
 
-    public static final String USUAL_FORAMT = "YYYY-MM-dd HH:mm:ss";
+    public static final String USUAL_FORMAT = "YYYY-MM-dd HH:mm:ss";
 
     public static String getCurrentDateFormat(String format){
         return getDateFormat(new Date(),format);
@@ -24,7 +24,7 @@ public class DateUtil {
     }
 
     public static void main(String[] args) {
-        String currentDateFormat = getCurrentDateFormat(USUAL_FORAMT);
+        String currentDateFormat = getCurrentDateFormat(USUAL_FORMAT);
         System.out.print(currentDateFormat);
     }
 
