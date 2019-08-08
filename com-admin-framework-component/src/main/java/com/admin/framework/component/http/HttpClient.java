@@ -1,114 +1,117 @@
 package com.admin.framework.component.http;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Iterator;
+
+import com.admin.framework.component.utils.ArrayUtil;
+import com.admin.framework.component.utils.IOUtil;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import com.admin.framework.component.utils.JSONUtil;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-
-
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 
 /**
  *
  * @author ZSW
- * @date 2019/2/21
+ * @date 2019/8/8
  */
 public class HttpClient {
 
-    public String doGet(String url) {
-        CloseableHttpClient httpClient = null;
-        CloseableHttpResponse response = null;
-        String result = "";
+    private final String HTTPS_PROTOCOL = "https";
+    private final String HTTP_PROTOCOL = "http";
+    private SSLKey sslKey;
+    public HttpClient(){}
+    public HttpClient(SSLKey sslKey){
+        this.sslKey = sslKey;
+    }
+
+    /**
+    * 向指定 URL 发送请求
+    * @param url 发送请求的 URL
+    * @param param 请求参数，请求参数应该是 json 的形式。
+    *  @return 所代表远程资源的响应结果
+    */
+    public HttpResponse request(String url, String... param) throws HttpException {
+        HttpURLConnection conn = getConnection(url);
         try {
-            // 通过址默认配置创建一个httpClient实例
-            httpClient = HttpClients.createDefault();
-            // 创建httpGet远程连接实例
-            HttpGet httpGet = new HttpGet(url);
-            // 设置请求头信息，鉴权
-            httpGet.setHeader("Authorization", "Bearer da3efcbf-0845-4fe3-8aba-ee040be542c0");
-            // 设置配置请求参数
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(35000)// 连接主机服务超时时间
-                    .setConnectionRequestTimeout(35000)// 请求超时时间
-                    .setSocketTimeout(60000)// 数据读取超时时间
-                    .build();
-            // 为httpGet实例设置配置
-            httpGet.setConfig(requestConfig);
-            // 执行get请求得到返回对象
-            response = httpClient.execute(httpGet);
-            // 通过返回对象获取返回数据
-            HttpEntity entity = response.getEntity();
-            // 通过EntityUtils中的toString方法将结果转换为字符串
-            result = EntityUtils.toString(entity);
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
+            // 设置通用的请求属性
+            conn.setRequestProperty("accept", "*/*");
+            conn.setRequestProperty("connection", "Keep-Alive");
+            conn.setRequestProperty("content-Type", "application/json");
+            conn.setRequestProperty("user-agent",
+                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+            // 发送POST请求必须设置如下两行
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            // 获取URLConnection对象对应的输出流
+            PrintWriter out = new PrintWriter(conn.getOutputStream());
+            // 发送请求参数
+            if(!ArrayUtil.isEmpty(param)){
+                out.print(param[0]);
+            }
+            // flush输出流的缓冲
+            out.flush();
+            return getResponse(conn);
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            // 关闭资源
-            if (null != response) {
-                try {
-                    response.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (null != httpClient) {
-                try {
-                    httpClient.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            throw new HttpException("发送请求失败",e);
         }
-        return result;
+    }
+
+    /**
+     * 获取链接
+     * @param url
+     * @return
+     * @throws HttpException
+     */
+    private HttpURLConnection getConnection(String url) throws HttpException {
+        try {
+            URL realUrl = new URL(url);
+            if (url.startsWith(HTTPS_PROTOCOL)) {
+                // 创建SSLContext对象，并使用我们指定的信任管理器初始化  
+                TrustManager[] tm = {new SSLTrustManager(sslKey)};
+                SSLContext sslContext = SSLContext.getInstance("SSL");
+                sslContext.init(null, tm, new java.security.SecureRandom());
+                // 从上述SSLContext对象中得到SSLSocketFactory对象  
+                SSLSocketFactory ssf = sslContext.getSocketFactory();
+
+                // 打开和URL之间的连接
+
+                HttpsURLConnection conn = (HttpsURLConnection) realUrl.openConnection();
+                conn.setSSLSocketFactory(ssf);
+                return conn;
+            } else {
+                return (HttpsURLConnection) realUrl.openConnection();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new HttpException("获取http链接失败", e);
+        }
     }
 
 
-    /**
-     * post请求
-     * @param url
-     * @param map
+        /**
+     * 获取响应数据
+     * @param conn
      * @return
+     * @throws IOException
      */
-    public static String doPost(String url,Map map){
-        String json = JSONUtil.objToJsonStr(map);
-        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost(url);
-        try {
-            StringEntity s = new StringEntity(json);
-            s.setContentEncoding("UTF-8");
-            s.setContentType("application/json");//发送json数据需要设置contentType
-            post.setEntity(s);
-            HttpResponse res = httpclient.execute(post);
-            if(res.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
-                String result = EntityUtils.toString(res.getEntity());// 返回json格式：
-                return result;
-            }
-            return null;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    private HttpResponse getResponse(HttpURLConnection conn) throws IOException {
+        int responseCode = conn.getResponseCode();
+        // 定义BufferedReader输入流来读取URL的响应
+        InputStream inputStream = conn.getInputStream();
+        HttpResponse response = new HttpResponse();
+        response.setCode(responseCode);
+        response.setInputStream(inputStream);
+        String body = IOUtil.inputToString(inputStream);
+        response.setBody(body);
+        Map<String, List<String>> header = conn.getHeaderFields();
+        response.setHeaders(header);
+        return response;
     }
 
 }
