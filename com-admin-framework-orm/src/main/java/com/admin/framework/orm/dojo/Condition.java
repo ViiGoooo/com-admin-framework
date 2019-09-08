@@ -1,6 +1,7 @@
 package com.admin.framework.orm.dojo;
 
 import com.admin.framework.component.utils.ArrayUtil;
+import com.admin.framework.component.utils.MD5Util;
 import com.admin.framework.component.utils.ReflectUil;
 import com.admin.framework.component.utils.StringUtil;
 import com.admin.framework.orm.constant.ConditionExpressionEnum;
@@ -30,7 +31,7 @@ public class Condition<T> {
         if(isSqlInject(column)){
             throw new DojoException("参数不合法");
         }
-        if(value != null){
+        if(!ArrayUtil.isEmpty(value)){
             for(int x = 0 ; x < value.length ; x++){
                 if(isSqlInject(value[x].toString())){
                     throw new DojoException("参数不合法");
@@ -47,12 +48,16 @@ public class Condition<T> {
 
     public String getSql(){
         String sql = this.expression.getValue();
-        sql = sql.replace(COLUMN_KEY,column);
+        sql = sql.replace(COLUMN_KEY,"`"+column+"`");
         if(!ArrayUtil.isEmpty(this.value)){
             for(int x = 0 ; x < this.value.length ; x++){
-                String v = this.value[x].toString();
+                String v = "'"+this.value[x].toString()+"'";
                 int i = sql.indexOf(VALUE_KEY);
                 sql = StringUtil.replacePosition(sql,VALUE_KEY,v,i);
+            }
+        }else{
+            if(sql.contains(VALUE_KEY)){
+                sql = sql.replace(VALUE_KEY,"''");
             }
         }
         return sql;
@@ -70,7 +75,8 @@ public class Condition<T> {
         String injStrArr[] = injStr.split("\\|");
         injectStr = injectStr.toLowerCase();
         for (int i = 0; i < injStrArr.length; i++) {
-            if (injectStr.indexOf(injStrArr[i]) >= 0) {
+            boolean equals = injStrArr[i].equals(injectStr);
+            if(equals){
                 return true;
             }
         }
@@ -78,5 +84,7 @@ public class Condition<T> {
     }
 
     public static void main(String[] args) {
+        String encrypt = MD5Util.encrypt("1234561234");
+        int x = 0;
     }
 }

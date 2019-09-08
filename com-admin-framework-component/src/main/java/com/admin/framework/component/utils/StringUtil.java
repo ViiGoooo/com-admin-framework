@@ -79,7 +79,7 @@ public class StringUtil {
      * @param separate
      * @return
      */
-    public static List<String> join(String strings,String separate){
+    public static List<String> toList(String strings,String separate){
         List<String> result = new ArrayList<>();
         for(String str:strings.split(separate)){
             result.add(str);

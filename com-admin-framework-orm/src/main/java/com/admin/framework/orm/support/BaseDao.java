@@ -10,13 +10,15 @@ import java.util.Map;
  * @author ZSW
  * @date 2018/11/18
  */
-public interface BaseDao<T> {
+public interface BaseDao<T,ID> {
     /**
      * 自定义查询
      * @param sql
      * @return
      */
     List<T> query(List<String> sql);
+
+    Integer count();
 
     /**
      * 分页
@@ -38,14 +40,14 @@ public interface BaseDao<T> {
      * @param id
      * @return
      */
-    int removeById(Integer id);
+    int removeById(ID id);
 
     /**
      * 批量删除
      * @param ids
      * @return
      */
-    int batchRemovedByIds(List<Integer> ids);
+    int batchRemovedByIds(List<ID> ids);
 
     /**
      * 保存

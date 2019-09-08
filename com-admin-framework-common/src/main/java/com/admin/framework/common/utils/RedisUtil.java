@@ -1,11 +1,9 @@
 package com.admin.framework.common.utils;
 
-import com.admin.framework.component.exception.CacheException;
+import com.admin.framework.component.cache.CacheException;
 import com.admin.framework.component.utils.JSONUtil;
 import com.admin.framework.component.utils.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +17,9 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class RedisUtil<T> {
+
+    private static TimeUnit DEFAULT_TIME_UNIT = TimeUnit.SECONDS;
+
     private static RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
@@ -33,7 +34,7 @@ public class RedisUtil<T> {
      * @return
      * @throws CacheException
      */
-    public static boolean setString(String key,String value) throws CacheException {
+    public static boolean setString(String key,String value){
         if(StringUtil.isEmpty(key) || StringUtil.isEmpty(value)){
             return false;
         }
@@ -47,13 +48,27 @@ public class RedisUtil<T> {
      * @param value     值
      * @param expire    过期时间
      * @return
-     * @throws CacheException
      */
-    public static boolean setString(String key,String value,Integer expire) throws CacheException{
+    public static boolean setString(String key,String value,Integer expire){
         if(StringUtil.isEmpty(key) || StringUtil.isEmpty(value)){
             return false;
         }
-        redisTemplate.opsForValue().set(key,value,expire,TimeUnit.SECONDS);
+        setString(key,value,expire,DEFAULT_TIME_UNIT);
+        return true;
+    }
+
+    /**
+     * 存储字符串
+     * @param key   key
+     * @param value     值
+     * @param expire    过期时间
+     * @return
+     */
+    public static boolean setString(String key,String value,Integer expire,TimeUnit timeUnit){
+        if(StringUtil.isEmpty(key) || StringUtil.isEmpty(value)){
+            return false;
+        }
+        redisTemplate.opsForValue().set(key,value,expire,timeUnit);
         return true;
     }
 
@@ -63,10 +78,9 @@ public class RedisUtil<T> {
      * @param t
      * @param <T>
      * @return
-     * @throws CacheException
      */
-    public static<T> boolean setObj(String key,T t) throws CacheException{
-        String s = JSONUtil.objToJsonStr(t.getClass());
+    public static<T> boolean setObj(String key,T t){
+        String s = JSONUtil.objToJsonStr(t);
         if(StringUtil.isEmpty(s)){
             return false;
         }
@@ -79,14 +93,29 @@ public class RedisUtil<T> {
      * @param <T>
      * @param expire
      * @return
-     * @throws CacheException
      */
-    public static<T> boolean setObj(String key,T t,Integer expire) throws CacheException{
-        String s = JSONUtil.objToJsonStr(t.getClass());
+    public static<T> boolean setObj(String key,T t,Integer expire){
+        String s = JSONUtil.objToJsonStr(t);
         if(StringUtil.isEmpty(s)){
             return false;
         }
         return setString(key,s,expire);
+
+    }
+    /**
+     * 设置一个对象
+     * @param key
+     * @param t
+     * @param <T>
+     * @param expire
+     * @return
+     */
+    public static<T> boolean setObj(String key,T t,Integer expire,TimeUnit timeUnit){
+        String s = JSONUtil.objToJsonStr(t);
+        if(StringUtil.isEmpty(s)){
+            return false;
+        }
+        return setString(key,s,expire,timeUnit);
     }
 
 
@@ -95,7 +124,7 @@ public class RedisUtil<T> {
      * @param key
      * @return
      */
-    public static String getString(String key) throws CacheException{
+    public static String getString(String key){
         Object o = redisTemplate.opsForValue().get(key);
         if(o == null){
             return null;
@@ -110,7 +139,7 @@ public class RedisUtil<T> {
      * @param <T>
      * @return
      */
-    public static<T> T getObj(String key,Class<T> clz) throws CacheException{
+    public static<T> T getObj(String key,Class<T> clz){
         String string = getString(key);
         if(StringUtil.isEmpty(string)){
             return null;
@@ -125,12 +154,20 @@ public class RedisUtil<T> {
      * @param <T>
      * @return
      */
-    public static<T> List<T> getList(String key,Class<T> clz) throws CacheException{
+    public static<T> List<T> getList(String key,Class<T> clz){
         String string = getString(key);
         if(StringUtil.isEmpty(string)){
             return null;
         }
         return JSONUtil.jsonToList(string,clz);
+    }
+
+    /**
+     * 删除key
+     * @param key
+     */
+    public static void remove(String key){
+        redisTemplate.delete(key);
     }
 
 

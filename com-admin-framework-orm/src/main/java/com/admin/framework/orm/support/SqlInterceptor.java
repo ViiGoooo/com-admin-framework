@@ -51,11 +51,6 @@ public class SqlInterceptor implements Interceptor{
         try {
             Map map = (Map) paramObject;
             page = (Page) map.get("page");
-            Map param = (Map) map.get("query");
-            Integer pageSize = MapUtil.getInteger(param, "pageSize");
-            Integer pageNumber = MapUtil.getInteger(param, "pageNumber");
-            page.setCurrentPage(pageNumber);
-            page.setPageSize(pageSize);
         }catch (Exception e){
             return invocation.proceed();
         }
@@ -70,7 +65,9 @@ public class SqlInterceptor implements Interceptor{
         int total = getTotal(parameterHandler, connection, countSql);
 //        Page<?> page = (Page<?>) paramObject;
         page.setTotal(total);
-        String limitSql = dialect.getLimitString(originalSql, page.getCurrentPage()-1, page.getPageSize());
+        page.setTotalPage(total,page.getPageSize());
+        Integer offset = (page.getCurrentPage() - 1) * page.getPageSize();
+        String limitSql = dialect.getLimitString(originalSql, offset, page.getPageSize());
         metaStatementHandler.setValue("delegate.boundSql.sql",limitSql);
         return invocation.proceed();
     }

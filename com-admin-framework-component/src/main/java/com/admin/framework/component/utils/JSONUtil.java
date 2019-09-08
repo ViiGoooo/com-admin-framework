@@ -3,8 +3,10 @@ package com.admin.framework.component.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,13 +21,18 @@ public class JSONUtil<T> {
 
     private static ObjectMapper mapper = new ObjectMapper();
 
+    static {
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
     public static String objToJsonStr(Object object){
         if(object == null){
             return null;
         }
         try {
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
             return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -70,16 +77,6 @@ public class JSONUtil<T> {
             e.printStackTrace();
             throw new RuntimeException("json转换异常");
         }
-    }
-
-    /**
-     * 对象转map
-     * @param o
-     * @return
-     */
-    public static Map objToMap(Object o){
-        String s = objToJsonStr(o);
-        return jsonToObj(s,Map.class);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.admin.framework.component.excel;
 
 import com.admin.framework.component.utils.FileUtil;
+import com.admin.framework.component.utils.IOUtil;
 import com.admin.framework.component.utils.MapUtil;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
@@ -19,35 +20,38 @@ import java.util.Map;
  * @author ZSW
  * @date 2019/1/22
  */
-public class ExcelHandler {
-
-    /**
-     * 读取excel
-     * @param file
-     * @return
-     */
-    public static Map<String,List<Map<String,Object>>> readExcel(File file){
-        if(!file.exists()){
-            throw new RuntimeException("文件不存在");
-        }
-        Map<String,List<Map<String,Object>>> result = new HashMap();
-        try {
-            Workbook book = getWorkBook(file);
-            return readExcel(book);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
+public class ExcelHandler{
 
     /**
      * 读取excel
      * @param filePath
      * @return
      */
-    public static Map<String,List<Map<String,Object>>> readExcel(String filePath){
+    public static Map<String,List<Map>> readExcel(String filePath) throws FileNotFoundException {
         File file = FileUtil.getFile(filePath);
         return readExcel(file);
+    }
+
+    /**
+     * 读取excel
+     * @param file
+     * @return
+     */
+    public static Map<String,List<Map>> readExcel(File file) throws FileNotFoundException {
+        if(!file.exists()){
+            throw new RuntimeException("文件不存在");
+        }
+        return readExcel(new FileInputStream(file));
+    }
+
+    /**
+     * 读取excel
+     * @param inputStream
+     * @return
+     */
+    public static Map<String,List<Map>> readExcel(InputStream inputStream){
+        Workbook book = getWorkBook(inputStream);
+        return readExcel(book);
     }
 
 
@@ -56,22 +60,26 @@ public class ExcelHandler {
      * @param book
      * @return
      */
-    private static Map<String,List<Map<String,Object>>> readExcel(Workbook book){
-        Map<String,List<Map<String,Object>>> result = new HashMap(16);
+    private static Map<String,List<Map>> readExcel(Workbook book){
+        Map<String,List<Map>> result = new HashMap(16);
         int sheets = book.getNumberOfSheets();
         for(int x = 0 ; x < sheets ; x ++){
             Sheet sheet = book.getSheetAt(x);
             String sheetName = sheet.getSheetName();
             Row firstRow = sheet.getRow(0);
+            if(firstRow == null){
+                continue;
+            }
             int rowNumber = sheet.getLastRowNum();
             int columnNumber = firstRow.getPhysicalNumberOfCells();
 
             List<String> headers = new ArrayList<String>();
             for(int i = 0 ; i < columnNumber; i++){
-                String header = firstRow.getCell(i).getStringCellValue();
+                Cell cell = firstRow.getCell(i);
+                String header = getCellValue(cell);
                 headers.add(header);
             }
-            List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+            List<Map> list = new ArrayList<Map>();
             for(int y = 1 ; y <= rowNumber ; y++){
                 Row row = sheet.getRow(y);
                 Map map = new HashMap();
@@ -81,7 +89,10 @@ public class ExcelHandler {
                     String header = headers.get(z);
                     map.put(header,cellValue);
                 }
-                list.add(map);
+                boolean allEmpty = MapUtil.isAllEmpty(map);
+                if(!allEmpty){
+                    list.add(map);
+                }
             }
             result.put(sheetName,list);
         }
@@ -89,20 +100,34 @@ public class ExcelHandler {
     }
 
 
+    /**
+     * 获取workbook
+     * @param file
+     * @return
+     * @throws FileNotFoundException
+     */
+    public static Workbook getWorkBook(File file) throws FileNotFoundException {
+        InputStream ins = new FileInputStream(file);
+        return getWorkBook(ins);
+    }
 
-
-    public static Workbook getWorkBook(File file){
+    /**
+     * 获取workbook
+     * @param inputStream
+     * @return
+     */
+    public static Workbook getWorkBook(InputStream inputStream){
         Workbook book = null;
+        ByteArrayOutputStream byteArrayOutputStream = null;
         try {
-            InputStream ins = new FileInputStream(file);
-            book = new HSSFWorkbook(ins);
+            byteArrayOutputStream = IOUtil.cloneInputStream(inputStream);
+            book = new HSSFWorkbook(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
         }catch (Exception e){
             try {
-                InputStream ins = new FileInputStream(file);
-                book = new XSSFWorkbook(ins);
+                book = new XSSFWorkbook(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
             } catch (Exception e1) {
                 e1.printStackTrace();
-                throw new RuntimeException("文件"+file.getName()+"无法读取");
+                throw new RuntimeException("文件无法读取");
             }
         }
         return book;
@@ -193,6 +218,15 @@ public class ExcelHandler {
         }
         book.write(out);
         book.close();
+    }
+
+    public static void main(String[] args) {
+        try {
+            Map<String, List<Map>> stringListMap = ExcelHandler.readExcel("C:\\Users\\Administrator\\Downloads\\apply (3).xlsx");
+            int x  = 0;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
 }

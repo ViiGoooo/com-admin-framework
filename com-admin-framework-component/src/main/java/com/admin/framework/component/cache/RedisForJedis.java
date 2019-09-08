@@ -1,6 +1,5 @@
 package com.admin.framework.component.cache;
 
-import com.admin.framework.component.exception.CacheException;
 import com.admin.framework.component.utils.JSONUtil;
 import com.admin.framework.component.utils.StringUtil;
 import redis.clients.jedis.Jedis;

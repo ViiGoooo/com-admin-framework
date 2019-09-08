@@ -15,8 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Lazy(false)
-public class SpringBeanUtil implements ApplicationContextAware
-{
+public class SpringBeanUtil implements ApplicationContextAware {
     /**
      * 上下文对象实例
      */

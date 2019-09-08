@@ -29,7 +29,7 @@ public class ArrayUtil {
      * @param separate
      * @return
      */
-    public static String join(Object[] target,String separate){
+    public static String toStr(Object[] target,String separate){
         String str = "";
         for (Object o:target) {
             str += o + separate;
@@ -39,7 +39,17 @@ public class ArrayUtil {
     }
 
     public static boolean isEmpty(Object[] arr){
-        return arr == null || arr.length <= 0;
+        if(arr != null && arr.length > 0){
+            boolean f = true;
+            for(Object o:arr){
+                if(o != null){
+                    f = false;
+                }
+            }
+            return f;
+        }else{
+            return true;
+        }
     }
 
     /**

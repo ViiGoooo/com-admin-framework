@@ -19,12 +19,21 @@ public class ListUtil<T> {
     }
 
     /**
+     * 是否为空
+     * @param target
+     * @return
+     */
+    public static boolean isNotEmpty(List<?>target){
+        return !isEmpty(target);
+    }
+
+    /**
      * 将list转为【分隔符】分隔的字符串
      * @param target
      * @param separate
      * @return
      */
-    public static String join(List<?>target,String separate){
+    public static String toStr(List<?>target,String separate){
         String str = "";
         for (Object o:target) {
             str += o + separate;
@@ -47,7 +56,4 @@ public class ListUtil<T> {
         str = str.substring(0,str.length() - 1);
         return str;
     }
-
-
-
 }

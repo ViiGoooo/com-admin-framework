@@ -3,6 +3,7 @@ package com.admin.framework.component.http;
 import com.admin.framework.component.utils.IOUtil;
 import lombok.Data;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;

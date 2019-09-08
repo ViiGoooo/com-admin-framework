@@ -10,16 +10,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author ZSW
  * @date 2019/3/2
  */
-@Configuration
-public class FileConfig implements WebMvcConfigurer {
+//@Configuration
+public class FileConfig {
 
-    @Value("${file.base}")
-    private String fileBase;
 
-    @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         //配置server虚拟路径，handler为jsp中访问的目录，locations为files相对应的本地路径
-        registry.addResourceHandler("/files/**").addResourceLocations("file:///"+fileBase);
+//        registry.addResourceHandler("/files/**").addResourceLocations("file:///"+fileBase);
     }
 
 }

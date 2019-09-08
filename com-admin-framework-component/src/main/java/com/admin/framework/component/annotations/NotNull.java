@@ -25,6 +25,18 @@ public @interface NotNull {
     String message() default "";
 
     /**
+     * 最大长度
+     * @return
+     */
+    int maxLength() default 0;
+
+    /**
+     * 最小长度
+     * @return
+     */
+    int minLength() default 0;
+
+    /**
      * 是否可以为空
      * true-可以
      * false-不可以

@@ -1,13 +1,11 @@
 package com.admin.framework.common.aspects;
 
 import com.admin.framework.common.entity.Resp;
+import com.admin.framework.common.exception.BusinessException;
 import com.admin.framework.component.annotations.NotNull;
 import com.admin.framework.component.annotations.ParamAnnotation;
 import com.admin.framework.component.annotations.ParamField;
-import com.admin.framework.component.utils.ArrayUtil;
-import com.admin.framework.component.utils.JSONUtil;
-import com.admin.framework.component.utils.ListUtil;
-import com.admin.framework.component.utils.StringUtil;
+import com.admin.framework.component.utils.*;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -50,7 +48,7 @@ public class NotNullAspect {
 
     List<String> errorMsg = new ArrayList<>();
     @Around("pointcut()")
-    public Object around(ProceedingJoinPoint joinPoint){
+    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         try {
             errorMsg = new ArrayList<>();
             MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -79,17 +77,20 @@ public class NotNullAspect {
                 }
             }
             if(!ListUtil.isEmpty(errorMsg)){
-                String msg = ListUtil.join(errorMsg,"\n");
+                String msg = ListUtil.toStr(errorMsg,"\n");
                 if(RETURN_TYPE_NAME.equals(returnTypeName)){
                     return Resp.error(msg);
                 }else{
-                    throw new RuntimeException(msg);
+                    throw new BusinessException(msg);
                 }
             }
             return joinPoint.proceed();
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            throw new RuntimeException(throwable.getMessage());
+            if(throwable instanceof BusinessException){
+                throw new BusinessException(throwable.getMessage());
+            }else{
+                throw throwable;
+            }
         }
     }
 
@@ -150,32 +151,8 @@ public class NotNullAspect {
      * @param arg
      */
     private void handlerObj(Object arg){
-        Map map = JSONUtil.objToMap(arg);
-        Class<?> clz = arg.getClass();
-        Field[] fields = clz.getFields();
-        if(ArrayUtil.isEmpty(fields)){
-            fields = clz.getDeclaredFields();
-        }
-        for(Field field:fields){
-            String name = field.getName();
-            NotNull annotation = field.getAnnotation(NOT_NULL_ANNOTATION_CLASS);
-            boolean annotationPresent = field.isAnnotationPresent(NOT_NULL_ANNOTATION_CLASS);
-            if(!annotationPresent){
-                continue;
-            }
-            Object value = map.get(name);
-            String message = annotation.message();
-            String[] regular = annotation.regular();
-            boolean nullAble = annotation.nullAble();
-            if(!nullAble){
-                checkNull(name,value,message);
-                continue;
-            }
-            if(!ArrayUtil.isEmpty(regular)){
-                checkRegular(name,value,message,regular);
-                continue;
-            }
-        }
+        List<String> verify = NotNullVerifyUtil.verify(arg);
+        errorMsg.addAll(verify);
     }
 
     /**

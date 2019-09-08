@@ -1,5 +1,6 @@
 package com.admin.framework.component.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,21 @@ public class MapUtil {
 
     public static boolean isEmpty(Map map){
         return map == null || map.size() <= 0;
+    }
+
+    /**
+     * 是否全部为空
+     * @param map
+     * @return
+     */
+    public static boolean isAllEmpty(Map map){
+        List l = new ArrayList();
+        map.forEach((k,v)->{
+            if(v != null && !"".equals(v) ){
+              l.add(v);
+            }
+        });
+        return ListUtil.isEmpty(l);
     }
 
     /**
@@ -43,6 +59,16 @@ public class MapUtil {
      */
     public static Integer getInteger(Map map,Object key){
         return map.get(key) == null ? null : Integer.valueOf(map.get(key).toString());
+    }
+
+    /**
+     *  从map中获取int
+     * @param map
+     * @param key
+     * @return
+     */
+    public static Long getLong(Map map,Object key){
+        return map.get(key) == null ? null : Long.valueOf(map.get(key).toString());
     }
 
     /**

@@ -4,6 +4,7 @@ import com.admin.framework.common.utils.SpringBeanUtil;
 import com.admin.framework.component.utils.ListUtil;
 import com.admin.framework.component.utils.StringUtil;
 import com.admin.framework.orm.constant.ConditionExpressionEnum;
+import com.admin.framework.orm.exception.DojoException;
 import com.admin.framework.orm.support.BaseDao;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public abstract class BaseDojo<T> {
      * @param expression
      * @param params
      */
-    public void addSql(String column, ConditionExpressionEnum expression, Object... params){
+    public void addSql(String column, ConditionExpressionEnum expression, Object... params) throws DojoException {
         Condition condition = new Condition(entityClz,alias,StringUtil.humpToUnderline(column),expression, params);
         conditions.add(condition);
     }
@@ -57,6 +58,5 @@ public abstract class BaseDojo<T> {
     public List<T> list(){
         return dao.query(conditions.getSql());
     }
-
 
 }

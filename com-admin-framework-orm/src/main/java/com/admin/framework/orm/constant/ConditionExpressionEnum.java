@@ -7,43 +7,43 @@ public enum ConditionExpressionEnum {
     /**
      * 大于
      */
-    GREATER(" column > value "),
+    GREATER(" and column > value "),
     /**
      * 大于等于
      */
-    GREATER_EQUALS(" column >= value "),
+    GREATER_EQUALS(" and  column >= value "),
     /**
      * 等于
      */
-    EQUALS(" column = value "),
+    EQUALS(" and column = value "),
     /**
      * 小于
      */
-    LESS(" column  < value "),
+    LESS(" and column  < value "),
     /**
      * 小于等于
      */
-    LESS_EQUALS(" column <= value "),
+    LESS_EQUALS(" and column <= value "),
     /**
      * 模糊查询
      */
-    CONTAIN(" column like '%'||value||'%' "),
+    CONTAIN(" and column like '%value%' "),
     /**
      * 以？开头
      */
-    START(" column like value||'%' "),
+    START(" and column like value%' "),
     /**
      * 以？结束
      */
-    END(" column like '%'||value "),
+    END(" and column like '%value "),
     /**
      * 在...之间
      */
-    BETWEEN(" column between value and value "),
+    BETWEEN(" and column between value and value "),
     /**
      * 为空
      */
-    NULL(" column is null "),
+    NULL(" and column is null "),
     /**
      * 不为空
      */

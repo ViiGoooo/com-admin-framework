@@ -1,7 +1,8 @@
 package com.admin.framework.component.utils;
 
 
-import lombok.Data;
+
+import org.apache.poi.ss.formula.functions.T;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -16,6 +17,12 @@ import java.util.Map;
  * @date 2018/11/20
  */
 public class ReflectUil {
+
+    /**
+     * 是否开启驼峰转下划线
+     */
+    public static boolean hump_to_underline = false;
+
 
     /**
      * 获取所有的成员变量
@@ -79,6 +86,20 @@ public class ReflectUil {
 
     /**
      * 实体类转map
+     * @param target
+     * @return
+     */
+    public static List<Map> beanToMap(List<?> target){
+        List<Map> result = new ArrayList<>();
+        for(Object o:target){
+            Map map = beanToMap(o);
+            result.add(map);
+        }
+        return result;
+    }
+
+    /**
+     * 实体类转map
      * @param object
      * @return
      */
@@ -95,7 +116,11 @@ public class ReflectUil {
             try {
                 Method method = clz.getMethod("get"+methodName);
                 Object invoke = method.invoke(object);
-                result.put(fieldName,invoke);
+                if(hump_to_underline){
+                    result.put(StringUtil.humpToUnderline(fieldName),invoke);
+                }else{
+                    result.put(fieldName,invoke);
+                }
             }catch (Exception e){
                 e.printStackTrace();
                 continue;

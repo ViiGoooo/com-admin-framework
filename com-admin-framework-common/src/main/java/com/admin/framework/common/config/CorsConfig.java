@@ -2,6 +2,7 @@ package com.admin.framework.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -12,6 +13,7 @@ import org.springframework.web.filter.CorsFilter;
  * @date 2018/8/11
  */
 @Configuration
+@Profile({"dev","test"})
 public class CorsConfig {
 
     private CorsConfiguration buildConfig() {

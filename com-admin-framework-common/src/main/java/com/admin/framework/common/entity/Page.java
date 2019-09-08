@@ -1,9 +1,11 @@
 package com.admin.framework.common.entity;
 
+import com.admin.framework.component.utils.MapUtil;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 分页查询类
@@ -11,7 +13,7 @@ import java.util.List;
  * @date 2018/12/28
  */
 @Data
-public class Page<T> extends Resp{
+public class Page<T>{
 
     /**
      *当前页
@@ -28,8 +30,14 @@ public class Page<T> extends Resp{
     /**
      * 总页数
      */
-    private Integer totalPage;
+    private Integer totalPage = 0;
 
+    private List<T> data;
+
+    public Page(Map param){
+        this.pageSize = MapUtil.getInteger(param, "pageSize");
+        this.currentPage = MapUtil.getInteger(param, "currentPage");
+    }
 
     public Page(Integer pageSize,Integer currentPage){
         this.pageSize = pageSize;
@@ -45,6 +53,8 @@ public class Page<T> extends Resp{
         this.totalPage = totalPage;
     }
 
-
+    public void setData(List data){
+        this.data = data;
+    }
 
 }

@@ -13,7 +13,7 @@ public class IOUtil {
      * @return
      * @throws IOException
      */
-    public static InputStream cloneInputStream(InputStream input) throws IOException {
+    public static ByteArrayOutputStream cloneInputStream(InputStream input) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
         int len;
@@ -21,7 +21,7 @@ public class IOUtil {
             baos.write(buffer, 0, len);
         }
         baos.flush();
-        return new ByteArrayInputStream(baos.toByteArray());
+        return baos;
     }
 
     /**
@@ -31,12 +31,23 @@ public class IOUtil {
      * @throws IOException
      */
     public static String inputToString(InputStream is) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
-        while(br.read() != -1){
-            sb.append(br.readLine());
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "/n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        return new String(sb.toString().getBytes("GBK"), "ISO-8859-1");
+        return sb.toString();
     }
 
 }

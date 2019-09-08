@@ -106,8 +106,11 @@ public class HttpClient {
         InputStream inputStream = conn.getInputStream();
         HttpResponse response = new HttpResponse();
         response.setCode(responseCode);
-        response.setInputStream(inputStream);
-        String body = IOUtil.inputToString(inputStream);
+        ByteArrayOutputStream bos = IOUtil.cloneInputStream(inputStream);
+        InputStream stream1 = new ByteArrayInputStream(bos.toByteArray());
+        InputStream stream2 = new ByteArrayInputStream(bos.toByteArray());
+        response.setInputStream(stream1);
+        String body = IOUtil.inputToString(stream2);
         response.setBody(body);
         Map<String, List<String>> header = conn.getHeaderFields();
         response.setHeaders(header);
