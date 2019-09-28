@@ -48,7 +48,7 @@ public class WxPayServiceImpl implements WxPayService {
 
             String param = XMLUtil.beanToXml(request);
             HttpClient httpClient = new HttpClient();
-            HttpResponse response = httpClient.request(unified_order, param);
+            HttpResponse response = httpClient.post(unified_order, param);
             String body = response.getBody();
             WxUnifiedOrderResponse unifiedOrderResponse = XMLUtil.xmlToBean(body, WxUnifiedOrderResponse.class);
             String returnCode = unifiedOrderResponse.getReturnCode();
@@ -88,8 +88,6 @@ public class WxPayServiceImpl implements WxPayService {
             result.setTimeStamp(timestamp);
             result.setPaySign(paySign);
             return result;
-        } catch (JsonProcessingException e) {
-            throw new WxException(e);
         } catch (IOException e) {
             throw new WxException(e);
         } catch (HttpException e) {
@@ -116,34 +114,4 @@ public class WxPayServiceImpl implements WxPayService {
             throw new WxException(e);
         }
     }
-
-    @Override
-    public WxJsConfig jsConfig(String ticket,String url) throws WxException {
-        String nonceStr = RandomUtil.getAllRandomStr(32);
-        String timestamp = System.currentTimeMillis() / 1000 + "";
-
-        SortedMap<String, Object> signParams = new TreeMap<String, Object>();
-        /*
-         signature:参与签名的字段包括
-            noncestr（随机字符串）
-            有效的jsapi_ticket, timestamp（时间戳）
-            url（当前网页的URL，不包含#及其后面部分）
-         */
-        signParams.put("jsapi_ticket", ticket);
-        signParams.put("noncestr", nonceStr);
-        signParams.put("timestamp", timestamp);
-        signParams.put("url", url);
-        String signature = WxPayUtil.createSign(signParams,null);
-        if(StringUtil.isEmpty(signature)){
-            throw new WxException("签名失败");
-        }
-
-        WxJsConfig config = new WxJsConfig();
-        config.setTimestamp(timestamp);
-        config.setNonceStr(nonceStr);
-        config.setSignature(signature);
-        return config;
-    }
-
-
 }

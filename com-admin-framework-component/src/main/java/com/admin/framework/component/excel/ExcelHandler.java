@@ -196,12 +196,9 @@ public class ExcelHandler{
     /**
      * 导出数据
      * */
-    public static void export(List<ExcelEntity> list,File file) throws Exception{
+    public static void export(List<ExcelEntity> list,OutputStream out) throws IOException {
         //创建对象
-        Workbook book = getWorkBook(file);
-
-        OutputStream out = new FileOutputStream(file);
-
+        Workbook book = new HSSFWorkbook();
         for(ExcelEntity excel:list){
             String sheetName = excel.getSheetName();
             List<List<String>> data = excel.getData();
@@ -217,7 +214,6 @@ public class ExcelHandler{
             }
         }
         book.write(out);
-        book.close();
     }
 
     public static void main(String[] args) {

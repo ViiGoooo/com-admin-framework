@@ -3,11 +3,13 @@ package com.admin.framework.component.utils;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGEncodeParam;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
+import lombok.Data;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -16,13 +18,14 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.io.*;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @Author zsw
  * @Description
  * @Date Create in 14:59 2019\8\8 0008
  */
-public class ImageUtils {
+public class ImageUtil {
 
 
     /**
@@ -53,21 +56,25 @@ public class ImageUtils {
     }
 
     /**
-     * 将长图截取为正方形(获取中间最大的正方形)
+     * 获取图片尺寸
      * @param inputStream
-     * @param suffix
      * @return
      * @throws IOException
      */
-    public static BufferedImage squareToRectangle(InputStream inputStream, String suffix) throws IOException {
+    public static ImageData getSquareData(InputStream inputStream) throws IOException {
         ByteArrayOutputStream byteArray = IOUtil.cloneInputStream(inputStream);
         InputStream source = new ByteArrayInputStream(byteArray.toByteArray());
-        InputStream operation = new ByteArrayInputStream(byteArray.toByteArray());
         BufferedImage image = ImageIO.read(source);
         int sourceWidth = image.getWidth();
         int sourceHeight = image.getHeight();
+        ImageData imageData = new ImageData();
+        imageData.setImage(image);
         if(sourceWidth == sourceHeight){
-            return image;
+            imageData.setHeight(sourceHeight);
+            imageData.setWidth(sourceWidth);
+            imageData.setX(0);
+            imageData.setY(0);
+            return imageData;
         }
         int x = 0,y = 0,width = 0,height = 0;
         if(sourceWidth > sourceHeight){
@@ -82,13 +89,31 @@ public class ImageUtils {
             width = sourceHeight;
             height = sourceHeight;
         }
+        imageData.setHeight(height);
+        imageData.setWidth(width);
+        imageData.setX(x);
+        imageData.setY(y);
+        return imageData;
+    }
 
+    /**
+     * 将长图截取为正方形(获取中间最大的正方形)
+     * @param inputStream
+     * @param suffix
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage squareToRectangle(InputStream inputStream, String suffix) throws IOException {
+        ByteArrayOutputStream byteArray = IOUtil.cloneInputStream(inputStream);
+        InputStream source = new ByteArrayInputStream(byteArray.toByteArray());
+        InputStream operation = new ByteArrayInputStream(byteArray.toByteArray());
+        ImageData squareData = getSquareData(source);
         ImageInputStream iis = ImageIO.createImageInputStream(operation);
         Iterator<ImageReader> it = ImageIO.getImageReadersByFormatName(suffix); //ImageReader声称能够解码指定格式
         ImageReader reader = it.next();
         reader.setInput(iis, true); //将iis标记为true（只向前搜索）意味着包含在输入源中的图像将只按顺序读取
         ImageReadParam param = reader.getDefaultReadParam(); //指定如何在输入时从 Java Image I/O框架的上下文中的流转换一幅图像或一组图像
-        Rectangle rect = new Rectangle(x, y, width, height); //定义空间中的一个区域
+        Rectangle rect = new Rectangle(squareData.getX(), squareData.getY(), squareData.getWidth() , squareData.getHeight()); //定义空间中的一个区域
         param.setSourceRegion(rect); //提供一个 BufferedImage，将其用作解码像素数据的目标。
         BufferedImage result = reader.read(0, param); //读取索引imageIndex指定的对象
         return result;
@@ -201,20 +226,48 @@ public class ImageUtils {
         return result;
     }
 
+    /**
+     * 获取画布
+     * @param background
+     * @return
+     */
+    public static Graphics2D getGraphics2D(BufferedImage background){
+        Graphics2D g = background.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        return g;
+    }
+
+    /**
+     * 转inputstream
+     * @param bufferedImage
+     * @return
+     * @throws IOException
+     */
+    public static InputStream BufferedToInputstream(BufferedImage bufferedImage) throws IOException {
+        ByteArrayOutputStream bs = new ByteArrayOutputStream();
+        ImageOutputStream imOut = ImageIO.createImageOutputStream(bs);
+        ImageIO.write(bufferedImage, "png", imOut);
+        InputStream inputStream = new ByteArrayInputStream(bs.toByteArray());
+        bs.close();
+        imOut.close();
+        return inputStream;
+    }
+
 
     public static void main(String[] args) throws IOException {
-        String src = "C:\\Users\\Administrator\\Downloads\\background.png";
-        String dist = "C:\\Users\\Administrator\\Downloads\\background1.png";
-
-
-
-        File srcfile = new File(src);
-        File distfile = new File(dist);
-
-        System.out.println("压缩前图片大小：" + srcfile.length());
-        resize(srcfile, distfile,1024,0.9f);
-        System.out.println("压缩后图片大小：" + distfile.length());
-
+        String back = "C:\\Users\\Administrator\\Desktop\\成氏之家\\crowdfunding_template.png";
+        BufferedImage background = ImageIO.read(new File(back));
+        Graphics2D g = getGraphics2D(background);
     }
+
+    @Data
+    public static class ImageData{
+        private int x;
+        private int y;
+        private int width;
+        private int height;
+        private BufferedImage image;
+    }
+
 
 }

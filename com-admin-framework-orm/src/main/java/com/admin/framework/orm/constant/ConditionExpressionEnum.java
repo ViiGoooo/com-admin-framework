@@ -17,6 +17,10 @@ public enum ConditionExpressionEnum {
      */
     EQUALS(" and column = value "),
     /**
+     * 不等于
+     */
+    NOT_EQUALS(" and column <> value "),
+    /**
      * 小于
      */
     LESS(" and column  < value "),

@@ -1,5 +1,8 @@
 package com.admin.framework.wechat.contanst;
 
+import com.admin.framework.component.utils.StringUtil;
+import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+
 /**
  * @Author zsw
  * @Description
@@ -7,11 +10,12 @@ package com.admin.framework.wechat.contanst;
  */
 public enum WxMessageEventEnum {
 
-    CLICK(1,"CLICK","菜单点击事件"),
-//    VIEW(1,"VIEW","已关注"),
+    CLICK(1,"CLICK","点击菜单拉取消息时的事件推送"),
+    VIEW(1,"VIEW","点击菜单跳转链接时的事件推送"),
+    VIEW_MINIPROGRAM(1,"view_miniprogram","点击菜单跳转小程序的事件推送"),
     SUBSCRIBE(2,"subscribe","关注事件"),
     UNSUBSCRIBE(3,"unsubscribe","取消关注"),
-    SCAN(4,"SCAN","扫码"),
+    SCAN(4,"scan","扫码"),
     ;
     /**
      * @param key
@@ -23,6 +27,22 @@ public enum WxMessageEventEnum {
         }
         for(WxMessageEventEnum type:values()){
             if(type.getKey().equals(key)){
+                return type;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param value
+     * @return
+     */
+    public static WxMessageEventEnum getByValue(String value){
+        if(StringUtil.isEmpty(value)){
+            return null;
+        }
+        for(WxMessageEventEnum type:values()){
+            if(type.getValue().equals(value)){
                 return type;
             }
         }

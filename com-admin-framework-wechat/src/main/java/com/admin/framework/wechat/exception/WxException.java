@@ -31,6 +31,7 @@ public class WxException extends Exception {
     //用详细信息指定一个异常
     public WxException(List<String> message){
         super(JSONUtil.objToJsonStr(message));
+        this.msg = JSONUtil.objToJsonStr(message);
     }
 
     //用详细信息指定一个异常

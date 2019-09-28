@@ -2,6 +2,7 @@ package com.admin.framework.component.utils;
 
 
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -34,6 +35,18 @@ public class FileUtil {
      * @throws IOException
      */
     public static String save(InputStream inputStream,String fileName) throws IOException {
+        return save(inputStream,getFile(fileName));
+    }
+
+    /**
+     * 保存文件（bufferedImage）
+     * @param bufferedImage
+     * @param fileName
+     * @return
+     * @throws IOException
+     */
+    public static String save(BufferedImage bufferedImage, String fileName) throws IOException {
+        InputStream inputStream = ImageUtil.BufferedToInputstream(bufferedImage);
         return save(inputStream,getFile(fileName));
     }
 

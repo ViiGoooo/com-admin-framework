@@ -4,6 +4,8 @@ import com.admin.framework.component.http.HttpClient;
 import com.admin.framework.component.http.HttpException;
 import com.admin.framework.component.http.HttpResponse;
 import com.admin.framework.component.utils.JSONUtil;
+import com.admin.framework.component.utils.ListUtil;
+import com.admin.framework.component.utils.NotNullVerifyUtil;
 import com.admin.framework.wechat.contanst.WxButtonTypeEnum;
 import com.admin.framework.wechat.entity.WxButton;
 import com.admin.framework.wechat.entity.WxConfig;
@@ -25,14 +27,25 @@ import java.util.Map;
  */
 public class WxMenuServiceImpl implements WxMenuService {
     @Override
-    public void createMenu(List<WxButton> wxButton, String accessToken) throws WxException {
+    public void createMenu(List<WxButton> wxButtons, String accessToken) throws WxException {
+
+        for(WxButton e:wxButtons){
+            List<String> verify = NotNullVerifyUtil.verify(e);
+            if(!ListUtil.isEmpty(verify)){
+                throw new WxException(verify);
+            }
+            convert(e);
+            List<WxButton> subButton = e.getSubButton();
+            convert(subButton);
+        }
+
         String url = String.format(create_menu,accessToken);
         Map map = new HashMap<>();
-        map.put("button",wxButton);
+        map.put("button",wxButtons);
         String param = JSONUtil.objToJsonStr(map);
         HttpClient httpClient = new HttpClient();
         try {
-            HttpResponse response = httpClient.request(url, param);
+            HttpResponse response = httpClient.post(url, param);
             String body = response.getBody();
             WxResult wxResult = JSONUtil.jsonToObj(body, WxResult.class);
             if(!"ok".equals(wxResult.getErrmsg())){
@@ -41,6 +54,47 @@ public class WxMenuServiceImpl implements WxMenuService {
         } catch (HttpException e) {
             throw new WxException(e);
         }
+    }
+
+    @Override
+    public void remove(String accessToken) throws WxException {
+        HttpClient client = new HttpClient();
+        try {
+            String url = String.format(remove_menu,accessToken);
+            HttpResponse response = client.post(url);
+            String body = response.getBody();
+            WxResult wxResult = JSONUtil.jsonToObj(body, WxResult.class);
+            if(!"ok".equals(wxResult.getErrmsg())){
+                throw new WxException(wxResult.getErrmsg());
+            }
+        } catch (HttpException e) {
+            throw new WxException(e);
+        }
+    }
+
+    /**
+     * 转换数据
+     * @param wxButtons
+     */
+    private void convert(List<WxButton> wxButtons){
+        if(ListUtil.isEmpty(wxButtons)){
+            return;
+        }
+        wxButtons.forEach(e->{
+            WxButtonTypeEnum typeEnum = e.getTypeEnum();
+            e.setType(typeEnum.getValue());
+        });
+
+    }
+
+    /**
+     * 转换数据
+     * @param wxButton
+     */
+    private void convert(WxButton wxButton){
+        WxButtonTypeEnum typeEnum = wxButton.getTypeEnum();
+        wxButton.setType(typeEnum.getValue());
+        wxButton.setTypeEnum(null);
     }
 
 
@@ -58,7 +112,7 @@ public class WxMenuServiceImpl implements WxMenuService {
 
 
         WxButton button3 = new WxButton();
-        button3.setName("");
+        button3.setName("qq");
         button3.setType(WxButtonTypeEnum.MINI_PROGRAM.getValue());
         button3.setAppid("wxa2af042698930ccb");
         button3.setPagepath("pages/index/index");
@@ -67,7 +121,7 @@ public class WxMenuServiceImpl implements WxMenuService {
 //        WxAuthService wxAuthService = new WxAuthServiceImpl();
 //        WxToken wxToken = wxAuthService.getAppToken(new WxConfig("wx53b03c84d9aa1e79", "8f34b7737f154a7785e664340f644c12"));
 
-        String token = "24_yt6utLEjI0tM3shthNTdy7KJOqQAN-ePfeOBRdnVROBTbZzh-odM7LxPH9o0gxMce7ybQ_1WB_xzeJ_7NM51eJM2AGbLVZvLgvWBFBVQ9CgL-hbhCWXSn046UTHUfFip5nDg0JFl_by-TE9-PHEcAAASKH";
+        String token = "25_3QjDD_HXUGlghzwlNqBSPtmgsirPtmb9zE6o8sk4CB7NDLw1MIcZt6RAW7BZNYhzXLp8DhTiASmxoUEuO8ZE9U2Kn1PTE8Pl7tyoDIy9bfGDASIxM2jsxB9m7vUcr9w7C6PwBCPAk5gD4c0DQPOhAEAIHG";
         List<WxButton> wxButtons = new ArrayList<>();
         wxButtons.add(button1);
         wxButtons.add(button2);

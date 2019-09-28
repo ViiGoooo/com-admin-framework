@@ -35,7 +35,7 @@ public class WxCodeServiceImpl implements WxCodeService {
 
             String url = String.format(mini_code_url,miniCode.getAccessToken());
             String param = JSONUtil.objToJsonStr(miniCode);
-            HttpResponse response = httpClient.request(url, param);
+            HttpResponse response = httpClient.post(url, param);
             InputStream inputStream = response.getInputStream();
 
             ByteArrayOutputStream byteArray = IOUtil.cloneInputStream(inputStream);

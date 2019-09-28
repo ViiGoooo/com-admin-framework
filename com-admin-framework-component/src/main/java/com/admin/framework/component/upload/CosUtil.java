@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
 
+import com.admin.framework.component.utils.ImageUtil;
 import com.admin.framework.component.utils.ListUtil;
 import com.admin.framework.component.utils.NotNullVerifyUtil;
 import com.admin.framework.component.utils.StringUtil;
@@ -136,12 +137,31 @@ public class CosUtil {
     }
 
     /**
-     * 获取访问路径
+     * 获取图片完整路径
      * @param key
      * @return
      */
-    public String getPath(String key){
-        return uploadConfig.getDomainName() + key + "?" + uploadConfig.getThumbnail();
+    public String getVisitPath(String key){
+        return uploadConfig.getDomainName() + key;
+    }
+
+    /**
+     * 获取缩略图
+     * @param key
+     * @return
+     */
+    public String getThumbnailPath(String key){
+        return uploadConfig.getDomainName() + key + "?imageMogr2/thumbnail/" + uploadConfig.getThumbnail();
+    }
+
+    /**
+     * 获取缩略裁剪图
+     * @param key
+     * @return
+     */
+    public String getCropPath(String key, String width , String height){
+        String str = uploadConfig.getDomainName() + key + "?imageMogr2/crop/%sx%s/gravity/center";
+        return String.format(str,width,height);
     }
 
 

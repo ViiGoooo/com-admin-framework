@@ -25,10 +25,19 @@ public class NotNullVerifyUtil {
     public static List<String> verify(Object object){
         NotNullVerifyUtil.result = new ArrayList<>();
         Class<?> clz = object.getClass();
-        Field[] fields = clz.getFields();
-        if(ArrayUtil.isEmpty(fields)){
-            fields = clz.getDeclaredFields();
+        Field[] publicFields = clz.getFields();
+        Field[] privateFields = clz.getDeclaredFields();
+
+        if(ArrayUtil.isEmpty(publicFields) && ArrayUtil.isEmpty(privateFields)){
+            return result;
         }
+        Field[] fields = new Field[0];
+        if(!ArrayUtil.isEmpty(publicFields)){
+            fields = ArrayUtil.merge(publicFields, privateFields);
+        }else if(!ArrayUtil.isEmpty(privateFields)){
+            fields = ArrayUtil.merge(privateFields, publicFields);
+        }
+
         for(Field field : fields){
             NotNull annotation = field.getAnnotation(NotNull.class);
             if(annotation == null){
@@ -47,6 +56,8 @@ public class NotNullVerifyUtil {
         }
         return result;
     }
+
+
 
     /**
      * 校验

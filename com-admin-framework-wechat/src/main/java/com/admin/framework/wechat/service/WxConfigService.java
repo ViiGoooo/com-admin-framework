@@ -1,5 +1,8 @@
 package com.admin.framework.wechat.service;
 
+import com.admin.framework.wechat.entity.WxJsConfig;
+import com.admin.framework.wechat.exception.WxException;
+
 /**
  * @Author zsw
  * @Description
@@ -14,5 +17,16 @@ public interface WxConfigService {
      * @return
      */
     boolean checkSignature(String token,String signature, String timestamp, String nonce);
+
+
+
+    /**
+     * 获取jsapi的初始化值
+     * @param ticket
+     * @param url
+     * @return
+     */
+    WxJsConfig jsConfig(String ticket, String url) throws WxException;
+
 
 }

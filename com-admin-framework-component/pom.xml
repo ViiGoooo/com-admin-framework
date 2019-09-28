@@ -83,6 +83,16 @@
             <version>1.11.3</version>
         </dependency>
 
+        <!-- xml处理 -->
+        <!-- https://mvnrepository.com/artifact/dom4j/dom4j -->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+
+
+
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
@@ -105,6 +115,13 @@
             <groupId>com.tencent.cloud</groupId>
             <artifactId>cos-sts-java</artifactId>
             <version>3.0.4</version>
+        </dependency>
+
+        <!-- 二维码生成 -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.3.0</version>
         </dependency>
 
     </dependencies>

@@ -21,5 +21,12 @@ public interface WxMenuService {
     String create_menu = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=%s";
     void createMenu(List<WxButton> wxButton, String accessToken) throws WxException;
 
+    /**
+     * 删除
+     * @throws WxException
+     */
+    String remove_menu = "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=%s";
+    void remove(String accessToken) throws WxException;
+
 
 }

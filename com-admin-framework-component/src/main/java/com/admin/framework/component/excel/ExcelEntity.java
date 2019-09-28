@@ -14,7 +14,7 @@ import java.util.Map;
 @Data
 public class ExcelEntity {
 
-    ExcelEntity(String sheetName,List<Map<String,Object>> dataMap){
+    public ExcelEntity(String sheetName,List<Map<String,Object>> dataMap){
         this.sheetName = sheetName;
         this.dataMap = dataMap;
         setData();
@@ -29,20 +29,19 @@ public class ExcelEntity {
     private void setData(){
         List<List<String>> result = new ArrayList<>();
         List<String> keys = new ArrayList<>();
+
         for(Map<String,Object> map : dataMap){
             List<String> values = new ArrayList<>();
-            for(Map.Entry<String,Object> en:map.entrySet()){
-                String key = en.getKey();
-                String value = en.getValue() == null ? "" : en.getValue().toString();
-
-                if(!keys.contains(key)){
-                    keys.add(key);
+            map.forEach((k,v)->{
+                String value = v == null ? "" : v.toString();
+                if(!keys.contains(k)){
+                    keys.add(k);
                 }
                 values.add(value);
-            }
-            result.add(keys);
+            });
             result.add(values);
         }
+        result.add(0,keys);
         this.data = result;
     }
 

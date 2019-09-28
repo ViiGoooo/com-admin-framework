@@ -1,6 +1,7 @@
 package com.admin.framework.orm.support;
 
 import com.admin.framework.common.entity.Page;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ public interface BaseDao<T,ID> {
      * @param query
      * @return
      */
-    List<T> page(Page<T> page, Map query);
+    List<T> page(@Param("page") Page<T> page, @Param("query") Map query);
 
     /**
      * g更新

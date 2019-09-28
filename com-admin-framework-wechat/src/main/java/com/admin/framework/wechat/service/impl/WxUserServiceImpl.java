@@ -49,7 +49,7 @@ public class WxUserServiceImpl implements WxUserService {
 
     private WxUser getUser(String url) throws HttpException, WxException {
         HttpClient httpClient = new HttpClient();
-        HttpResponse response = httpClient.request(url);
+        HttpResponse response = httpClient.post(url);
         int i = response.getCode();
         if(i != 200){
             throw new WxException("获取微信用户信息失败");

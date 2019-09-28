@@ -171,4 +171,39 @@ public class RedisUtil<T> {
     }
 
 
+    /**
+     * 设置hash
+     * @param hashKey
+     * @param key
+     * @param value
+     */
+    public static void hashSet(String hashKey,String key,String value){
+        redisTemplate.opsForHash().put(hashKey,key,value);
+    }
+
+    public static<T> void hashSet(String hashKey,String key,T value){
+        String str = JSONUtil.objToJsonStr(value);
+        hashSet(hashKey,key,str);
+    }
+
+
+    /**
+     * 从hash中获取
+     * @param hashKey
+     * @param key
+     * @param clz
+     * @param <T>
+     * @return
+     */
+    public static<T> T hashGet(String hashKey,String key,Class<T> clz){
+        String o = hashGet(hashKey,key);
+        return JSONUtil.jsonToObj(o,clz);
+    }
+
+    public static String hashGet(String hashKey,String key){
+        Object o = redisTemplate.opsForHash().get(hashKey, key);
+        return o.toString();
+    }
+
+
 }

@@ -56,4 +56,10 @@ public class ListUtil<T> {
         str = str.substring(0,str.length() - 1);
         return str;
     }
+
+
+    public static<T> T[] toArray(List<T> target){
+        return (T[]) target.toArray();
+    }
+
 }

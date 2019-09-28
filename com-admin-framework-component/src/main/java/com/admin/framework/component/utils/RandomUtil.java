@@ -41,4 +41,21 @@ public class RandomUtil {
         }
         return sb.toString();
     }
+
+    /**
+     * 获取指定范围的随机数
+     * @param min
+     * @param max
+     * @return
+     */
+    public static Long nextLong(Long min,Long max){
+        return min + (int) (Math.random() * ((max - min) + 1));
+    }
+
+    public static void main(String[] args) {
+        long l = RandomUtil.nextLong(100L, 999L);
+        System.out.println(l);
+    }
+
+
 }

@@ -4,6 +4,7 @@ package com.admin.framework.component.document;
 import com.admin.framework.component.utils.FileUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import java.io.File;
 
@@ -41,6 +42,25 @@ public class HtmlHandler {
             e.printStackTrace();
         }
         return document;
+    }
+
+
+    public static void main(String[] args) {
+
+        String xmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+                "<root>\n" +
+                "\n" +
+                "    <sql id=\"getList\">\n" +
+                "        select * from coupon\n" +
+                "    </sql>\n" +
+                "\n" +
+                "</root>\n";
+
+        HtmlHandler htmlHandler = new HtmlHandler();
+        Document document = htmlHandler.getDocument(xmlStr, ElementType.CONTENT);
+        Elements children = document.children();
+        String html = children.html();
+        System.out.println(html);
     }
 
 

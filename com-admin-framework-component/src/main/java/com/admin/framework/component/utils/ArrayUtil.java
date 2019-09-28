@@ -1,6 +1,7 @@
 package com.admin.framework.component.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -65,6 +66,33 @@ public class ArrayUtil {
         }
         str = str.substring(0,str.length() - 1);
         return str;
+    }
+
+    /**
+     * 数组合并
+     * @param first
+     * @param rest
+     * @param <T>
+     * @return
+     */
+    public static<T> T[] merge(T[] first,T[]... rest){
+        if (first == null) {
+            throw new RuntimeException("合并的数组不能为null");
+        }
+        int totalLength = first.length;
+        for (T[] array : rest) {
+            totalLength += array.length;
+        }
+        T[] result = Arrays.copyOf(first, totalLength);
+        int offset = first.length;
+        for (T[] array : rest) {
+            if(ArrayUtil.isEmpty(array)){
+                continue;
+            }
+            System.arraycopy(array, 0, result, offset, array.length);
+            offset += array.length;
+        }
+        return result;
     }
 
 

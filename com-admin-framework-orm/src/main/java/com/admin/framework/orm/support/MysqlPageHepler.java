@@ -16,17 +16,20 @@ public class MysqlPageHepler {
     public static String getCountString(String querySelect) {
 
         querySelect = getLineSql(querySelect);
-        int orderIndex = getLastOrderInsertPoint(querySelect);
 
-        int formIndex = getAfterFormInsertPoint(querySelect);
-        String select = querySelect.substring(0, formIndex);
+        return "select count(1) count from (" + querySelect + ") t";
 
-        // 如果SELECT 中包含 DISTINCT 只能在外层包含COUNT
-        if (select.toLowerCase().indexOf("select distinct") != -1 || querySelect.toLowerCase().indexOf("group by") != -1) {
-            return new StringBuffer(querySelect.length()).append("select count(1) count from (").append(querySelect.substring(0, orderIndex)).append(" ) t").toString();
-        } else {
-            return new StringBuffer(querySelect.length()).append("select count(1) count ").append(querySelect.substring(formIndex, orderIndex)).toString();
-        }
+//        int orderIndex = getLastOrderInsertPoint(querySelect);
+//
+//        int formIndex = getAfterFormInsertPoint(querySelect);
+//        String select = querySelect.substring(0, formIndex);
+//
+//        // 如果SELECT 中包含 DISTINCT 只能在外层包含COUNT
+//        if (select.toLowerCase().indexOf("select distinct") != -1 || querySelect.toLowerCase().indexOf("group by") != -1) {
+//            return new StringBuffer(querySelect.length()).append("select count(1) count from (").append(querySelect.substring(0, orderIndex)).append(" ) t").toString();
+//        } else {
+//            return new StringBuffer(querySelect.length()).append("select count(1) count ").append(querySelect.substring(formIndex, orderIndex)).toString();
+//        }
     }
 
     /**

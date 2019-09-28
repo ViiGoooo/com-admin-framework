@@ -79,7 +79,7 @@ public class WxAuthServiceImpl implements WxAuthService {
      */
     private WxToken getToken(String url) throws HttpException, WxException {
         HttpClient client = new HttpClient();
-        HttpResponse request = client.request(url);
+        HttpResponse request = client.post(url);
         String body = request.getBody();
         WxToken wxToken = JSONUtil.jsonToObj(body, WxToken.class);
         if(wxToken == null){

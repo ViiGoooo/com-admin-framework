@@ -1,6 +1,5 @@
 package com.admin.framework.wechat.service.impl;
 
-import com.admin.framework.component.utils.StringUtil;
 import com.admin.framework.component.utils.XMLUtil;
 import com.admin.framework.wechat.contanst.WxMessageEventEnum;
 import com.admin.framework.wechat.contanst.WxMessageTypeEnum;
@@ -60,17 +59,18 @@ public class WxMessageServiceImpl implements WxMessageService {
     @Override
     public WxMessageEventEnum getEventType(WxMessageReceive receive) {
         String event = receive.getEvent();
+        WxMessageEventEnum eventEnum = WxMessageEventEnum.getByValue(event);
+
         String msgType = receive.getMsgType();
-        if(WxMessageEventEnum.CLICK.getValue().equals(event) && WxMessageTypeEnum.EVENT.getValue().equals(msgType)){
-            return WxMessageEventEnum.CLICK;
-        }
-        if(WxMessageEventEnum.SUBSCRIBE.getValue().equals(event) && WxMessageTypeEnum.EVENT.getValue().equals(msgType)){
-            return WxMessageEventEnum.SUBSCRIBE;
-        }
-        if(WxMessageEventEnum.UNSUBSCRIBE.getValue().equals(event) && WxMessageTypeEnum.EVENT.getValue().equals(msgType)){
-            return WxMessageEventEnum.UNSUBSCRIBE;
+        WxMessageTypeEnum typeEnum = WxMessageTypeEnum.getByValue(msgType);
+
+        switch (typeEnum){
+            case EVENT:
+                return eventEnum;
         }
         return null;
     }
+
+
 
 }

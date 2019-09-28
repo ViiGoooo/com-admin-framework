@@ -3,22 +3,28 @@ package com.admin.framework.wechat.contanst;
 /**
  * @Author zsw
  * @Description
- * @Date Create in 10:00 2019\8\15 0015
+ * @Date Create in 13:56 2019\9\17 0017
  */
-public enum  WxButtonTypeEnum {
-    CLICK(1,"click","发送消息"),
-    VIEW(2,"view","浏览网页"),
-    MINI_PROGRAM(3,"miniprogram","小程序跳转")
+public enum WxMediaTypeEnum {
+
+    /*
+     分别有图片（image）、语音（voice）、视频（video）和缩略图（thumb）
+     */
+
+    IMAGE(1,"image","图片"),
+    VOICE(2,"voice","语音"),
+    VIDEO(3,"video","视频"),
+    THUMB(4,"thumb","缩略图")
     ;
     /**
      * @param key
      * @return
      */
-    public static WxButtonTypeEnum getByKey(Integer key){
+    public static WxMediaTypeEnum getByKey(Integer key){
         if(key == null){
             return null;
         }
-        for(WxButtonTypeEnum type:values()){
+        for(WxMediaTypeEnum type:values()){
             if(type.getKey().equals(key)){
                 return type;
             }
@@ -26,7 +32,7 @@ public enum  WxButtonTypeEnum {
         return null;
     }
 
-    WxButtonTypeEnum(Integer key, String value, String  desc){
+    WxMediaTypeEnum(Integer key, String value, String  desc){
         this.key = key;
         this.value = value;
         this.desc = desc;
@@ -60,4 +66,5 @@ public enum  WxButtonTypeEnum {
     public void setDesc(String desc) {
         this.desc = desc;
     }
+
 }

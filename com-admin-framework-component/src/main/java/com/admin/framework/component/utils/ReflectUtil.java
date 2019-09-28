@@ -2,26 +2,25 @@ package com.admin.framework.component.utils;
 
 
 
-import org.apache.poi.ss.formula.functions.T;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  *  反射工具
  * @author ZSW
  * @date 2018/11/20
  */
-public class ReflectUil {
+public class ReflectUtil {
 
     /**
      * 是否开启驼峰转下划线
      */
     public static boolean hump_to_underline = false;
+    public static boolean underline_to_hump = false;
 
 
     /**
@@ -66,7 +65,7 @@ public class ReflectUil {
             T t = clz.newInstance();
             for(Field field : fields) {
                 String fieldName = field.getName();
-                Object value = map.get(fieldName);
+                Object value = getValue(map,fieldName);
                 if (value == null || "".equals(value)) {
                     continue;
                 }
@@ -130,6 +129,80 @@ public class ReflectUil {
     }
 
 
+    /**
+     * 对象拷贝
+     * @param source
+     * @param targetClz
+     * @param <S>
+     * @param <T>
+     * @param nullAble 是否忽略为null的属性
+     * @return
+     */
+    public static<S,T> T copy(S source,Class<T> targetClz,boolean nullAble) throws Exception {
+        Field[] targetFields = targetClz.getFields();
+        if(ArrayUtil.isEmpty(targetFields)){
+            targetFields = targetClz.getDeclaredFields();
+        }
+        Class sourceClass = source.getClass();
+        try {
+            T target = targetClz.newInstance();
+            for(Field field:targetFields){
+                Class<?> type = field.getType();
+                String fieldName = field.getName();
+                String  methodName = fieldName.substring(0,1).toUpperCase() + fieldName.substring(1);
+                try {
+                    Method getMethod = sourceClass.getMethod("get"+methodName);
+                    Object value = getMethod.invoke(source);
+
+                    if(nullAble && value == null){
+                        continue;
+                    }
+
+                    Method method = targetClz.getMethod("set" + methodName, type);
+                    Object v = getValue(value, type);
+                    method.invoke(target, v);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                    continue;
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    continue;
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                    continue;
+                }
+            }
+            return target;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            throw new Exception("拷贝失败");
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+            throw new Exception("拷贝失败");
+        }
+    }
+
+
+
+    /**
+     * 获取值
+     * @param map
+     * @param fieldName
+     * @return
+     */
+    private static Object getValue(Map map , String fieldName){
+        Object value = map.get(fieldName);
+        if (value == null) {
+            value = map.get(StringUtil.humpToUnderline(fieldName));
+            if (value == null) {
+                value = map.get(StringUtil.underToHump(fieldName));
+            }
+        }
+        return value;
+    }
+
+
+
     private static<T> T getValue(Object value,Class<T> clz){
         String simpleName = clz.getSimpleName();
         if(Integer.class.getSimpleName().equals(simpleName) || int.class.getSimpleName().equals(simpleName)){
@@ -159,6 +232,12 @@ public class ReflectUil {
         }
         if(Boolean.class.getSimpleName().equals(simpleName) || boolean.class.getSimpleName().equals(simpleName)){
             return (T) Boolean.valueOf(value.toString());
+        }
+        if(Date.class.getSimpleName().equals(simpleName)){
+            return (T) DateUtil.format(value.toString(),DateUtil.USUAL_FORMAT);
+        }
+        if(BigDecimal.class.getSimpleName().equals(simpleName)){
+            return (T) new BigDecimal(value.toString());
         }
         return null;
     }

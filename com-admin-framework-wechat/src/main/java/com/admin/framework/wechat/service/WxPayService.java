@@ -34,12 +34,4 @@ public interface WxPayService {
      */
     String notifyReturn() throws WxException;
 
-    /**
-     * 获取jsapi的初始化值
-     * @param ticket
-     * @param url
-     * @return
-     */
-    WxJsConfig jsConfig(String ticket,String url) throws WxException;
-
 }
